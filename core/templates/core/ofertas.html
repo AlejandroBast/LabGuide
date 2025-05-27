@@ -1,0 +1,943 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Convocatorias Académicas - LabGuides{% endblock %}
+
+{% block description %}Descubre oportunidades académicas en laboratorios universitarios. Monitores, auxiliares y posiciones de investigación organizadas por temáticas semanales.{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<!-- Header Section -->
+<div class="convocatorias-header">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <h1 class="page-title">
+                <i class="bi bi-mortarboard-fill me-3"></i>
+                Convocatorias Académicas
+            </h1>
+            <p class="page-subtitle">
+                Oportunidades en laboratorios universitarios para monitores, auxiliares e investigadores
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <span class="stat-number">24</span>
+                    <span class="stat-label">Convocatorias Activas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">6</span>
+                    <span class="stat-label">Nuevas Esta Semana</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="filters-section">
+    <div class="filters-container">
+        <div class="row g-3">
+            <div class="col-lg-4">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" placeholder="Buscar por laboratorio, área o palabra clave...">
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <select class="form-select">
+                    <option value="">Facultad</option>
+                    <option value="ciencias">Ciencias</option>
+                    <option value="ingenieria">Ingeniería</option>
+                    <option value="medicina">Medicina</option>
+                    <option value="quimica">Química</option>
+                    <option value="biologia">Biología</option>
+                </select>
+            </div>
+            <div class="col-lg-2">
+                <select class="form-select">
+                    <option value="">Área</option>
+                    <option value="quimica-analitica">Química Analítica</option>
+                    <option value="fisica-moderna">Física Moderna</option>
+                    <option value="biologia-molecular">Biología Molecular</option>
+                    <option value="electromagnetismo">Electromagnetismo</option>
+                    <option value="microbiologia">Microbiología</option>
+                </select>
+            </div>
+            <div class="col-lg-2">
+                <select class="form-select">
+                    <option value="">Tipo</option>
+                    <option value="monitor">Monitor</option>
+                    <option value="auxiliar">Auxiliar</option>
+                    <option value="investigador">Investigador Junior</option>
+                    <option value="practicas">Prácticas</option>
+                </select>
+            </div>
+            <div class="col-lg-2">
+                <button class="btn btn-primary w-100">
+                    <i class="bi bi-funnel me-2"></i>Filtrar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Quick Filters -->
+        <div class="quick-filters">
+            <span class="filter-label">Filtros rápidos:</span>
+            <button class="quick-filter-btn active">Todas</button>
+            <button class="quick-filter-btn">Destacadas</button>
+            <button class="quick-filter-btn">Esta Semana</button>
+            <button class="quick-filter-btn">Investigación</button>
+            <button class="quick-filter-btn">Urgentes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Positions Section -->
+<div class="featured-positions-section">
+    <h2 class="section-title">
+        <i class="bi bi-star-fill me-2"></i>
+        Convocatorias Destacadas
+    </h2>
+    
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="position-card featured-position">
+                <div class="position-header">
+                    <div class="lab-logo">
+                        <i class="bi bi-flask"></i>
+                    </div>
+                    <div class="position-badges">
+                        <span class="badge badge-featured">Destacada</span>
+                        <span class="badge badge-urgent">Urgente</span>
+                    </div>
+                </div>
+                <div class="position-content">
+                    <h3 class="position-title">Monitor de Química Analítica</h3>
+                    <div class="lab-info">
+                        <span class="lab-name">Laboratorio de Análisis Químico</span>
+                        <span class="position-location">
+                            <i class="bi bi-building"></i>Facultad de Ciencias
+                        </span>
+                    </div>
+                    <div class="position-details">
+                        <div class="detail-item">
+                            <i class="bi bi-currency-euro"></i>
+                            <span>800€ - 1.200€/mes</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="bi bi-clock-fill"></i>
+                            <span>20 horas/semana</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="bi bi-calendar-week"></i>
+                            <span>Semana 8-12</span>
+                        </div>
+                    </div>
+                    <div class="position-skills">
+                        <span class="skill-tag">Titulación</span>
+                        <span class="skill-tag">Espectroscopía</span>
+                        <span class="skill-tag">HPLC</span>
+                        <span class="skill-tag">Análisis Cuantitativo</span>
+                    </div>
+                </div>
+                <div class="position-actions">
+                    <button class="btn btn-primary">
+                        <i class="bi bi-send-fill me-2"></i>Aplicar Ahora
+                    </button>
+                    <button class="btn btn-outline-secondary">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary">
+                        <i class="bi bi-share"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="position-card featured-position">
+                <div class="position-header">
+                    <div class="lab-logo">
+                        <i class="bi bi-cpu-fill"></i>
+                    </div>
+                    <div class="position-badges">
+                        <span class="badge badge-featured">Destacada</span>
+                        <span class="badge badge-research">Investigación</span>
+                    </div>
+                </div>
+                <div class="position-content">
+                    <h3 class="position-title">Investigador Junior - Física Moderna</h3>
+                    <div class="lab-info">
+                        <span class="lab-name">Lab. de Mecánica Cuántica</span>
+                        <span class="position-location">
+                            <i class="bi bi-building"></i>Facultad de Física
+                        </span>
+                    </div>
+                    <div class="position-details">
+                        <div class="detail-item">
+                            <i class="bi bi-currency-euro"></i>
+                            <span>1.500€ - 2.000€/mes</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="bi bi-clock-fill"></i>
+                            <span>Tiempo Completo</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="bi bi-calendar-week"></i>
+                            <span>Semestre Completo</span>
+                        </div>
+                    </div>
+                    <div class="position-skills">
+                        <span class="skill-tag">Maestría</span>
+                        <span class="skill-tag">Óptica Cuántica</span>
+                        <span class="skill-tag">MATLAB</span>
+                        <span class="skill-tag">Publicaciones</span>
+                    </div>
+                </div>
+                <div class="position-actions">
+                    <button class="btn btn-primary">
+                        <i class="bi bi-send-fill me-2"></i>Aplicar Ahora
+                    </button>
+                    <button class="btn btn-outline-secondary">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary">
+                        <i class="bi bi-share"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- All Positions Section -->
+<div class="all-positions-section">
+    <div class="section-header">
+        <h2 class="section-title">Todas las Convocatorias</h2>
+        <div class="sort-options">
+            <select class="form-select">
+                <option value="recent">Más Recientes</option>
+                <option value="salary-high">Remuneración: Mayor a Menor</option>
+                <option value="deadline">Por Fecha Límite</option>
+                <option value="faculty">Por Facultad</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="positions-grid">
+        <!-- Position Card 1 -->
+        <div class="position-card">
+            <div class="position-header">
+                <div class="lab-logo">
+                    <i class="bi bi-tree-fill"></i>
+                </div>
+                <div class="position-badges">
+                    <span class="badge badge-new">Nuevo</span>
+                </div>
+            </div>
+            <div class="position-content">
+                <h3 class="position-title">Auxiliar de Biología Molecular</h3>
+                <div class="lab-info">
+                    <span class="lab-name">Lab. de Genética</span>
+                    <span class="position-location">
+                        <i class="bi bi-building"></i>Facultad de Biología
+                    </span>
+                </div>
+                <div class="position-details">
+                    <div class="detail-item">
+                        <i class="bi bi-currency-euro"></i>
+                        <span>600€ - 900€/mes</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>15 horas/semana</span>
+                    </div>
+                </div>
+                <div class="position-skills">
+                    <span class="skill-tag">PCR</span>
+                    <span class="skill-tag">Electroforesis</span>
+                    <span class="skill-tag">Cultivos</span>
+                </div>
+            </div>
+            <div class="position-actions">
+                <button class="btn btn-primary">Aplicar</button>
+                <button class="btn btn-outline-secondary">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Position Card 2 -->
+        <div class="position-card">
+            <div class="position-header">
+                <div class="lab-logo">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+                <div class="position-badges">
+                    <span class="badge badge-weekly">Semanal</span>
+                </div>
+            </div>
+            <div class="position-content">
+                <h3 class="position-title">Monitor de Electromagnetismo</h3>
+                <div class="lab-info">
+                    <span class="lab-name">Lab. de Física Aplicada</span>
+                    <span class="position-location">
+                        <i class="bi bi-building"></i>Facultad de Ingeniería
+                    </span>
+                </div>
+                <div class="position-details">
+                    <div class="detail-item">
+                        <i class="bi bi-currency-euro"></i>
+                        <span>700€ - 1.000€/mes</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>18 horas/semana</span>
+                    </div>
+                </div>
+                <div class="position-skills">
+                    <span class="skill-tag">Campos Eléctricos</span>
+                    <span class="skill-tag">Osciloscópio</span>
+                    <span class="skill-tag">Circuitos</span>
+                </div>
+            </div>
+            <div class="position-actions">
+                <button class="btn btn-primary">Aplicar</button>
+                <button class="btn btn-outline-secondary">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Position Card 3 -->
+        <div class="position-card">
+            <div class="position-header">
+                <div class="lab-logo">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="position-badges">
+                    <span class="badge badge-urgent">Urgente</span>
+                </div>
+            </div>
+            <div class="position-content">
+                <h3 class="position-title">Especialista en Seguridad de Lab</h3>
+                <div class="lab-info">
+                    <span class="lab-name">Oficina de Seguridad</span>
+                    <span class="position-location">
+                        <i class="bi bi-building"></i>Rectoría
+                    </span>
+                </div>
+                <div class="position-details">
+                    <div class="detail-item">
+                        <i class="bi bi-currency-euro"></i>
+                        <span>1.800€ - 2.500€/mes</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>Tiempo Completo</span>
+                    </div>
+                </div>
+                <div class="position-skills">
+                    <span class="skill-tag">Normativas</span>
+                    <span class="skill-tag">Auditorías</span>
+                    <span class="skill-tag">Capacitación</span>
+                </div>
+            </div>
+            <div class="position-actions">
+                <button class="btn btn-primary">Aplicar</button>
+                <button class="btn btn-outline-secondary">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Position Card 4 -->
+        <div class="position-card">
+            <div class="position-header">
+                <div class="lab-logo">
+                    <i class="bi bi-microscope"></i>
+                </div>
+            </div>
+            <div class="position-content">
+                <h3 class="position-title">Técnico de Microscopía</h3>
+                <div class="lab-info">
+                    <span class="lab-name">Centro de Microscopía</span>
+                    <span class="position-location">
+                        <i class="bi bi-building"></i>Servicios Centrales
+                    </span>
+                </div>
+                <div class="position-details">
+                    <div class="detail-item">
+                        <i class="bi bi-currency-euro"></i>
+                        <span>1.200€ - 1.600€/mes</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>25 horas/semana</span>
+                    </div>
+                </div>
+                <div class="position-skills">
+                    <span class="skill-tag">SEM</span>
+                    <span class="skill-tag">TEM</span>
+                    <span class="skill-tag">Preparación Muestras</span>
+                </div>
+            </div>
+            <div class="position-actions">
+                <button class="btn btn-primary">Aplicar</button>
+                <button class="btn btn-outline-secondary">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Position Card 5 -->
+        <div class="position-card">
+            <div class="position-header">
+                <div class="lab-logo">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <div class="position-badges">
+                    <span class="badge badge-internship">Prácticas</span>
+                </div>
+            </div>
+            <div class="position-content">
+                <h3 class="position-title">Practicante de Análisis de Datos</h3>
+                <div class="lab-info">
+                    <span class="lab-name">Lab. de Estadística</span>
+                    <span class="position-location">
+                        <i class="bi bi-building"></i>Facultad de Matemáticas
+                    </span>
+                </div>
+                <div class="position-details">
+                    <div class="detail-item">
+                        <i class="bi bi-currency-euro"></i>
+                        <span>400€ - 600€/mes</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>12 horas/semana</span>
+                    </div>
+                </div>
+                <div class="position-skills">
+                    <span class="skill-tag">R</span>
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">SPSS</span>
+                </div>
+            </div>
+            <div class="position-actions">
+                <button class="btn btn-primary">Aplicar</button>
+                <button class="btn btn-outline-secondary">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Position Card 6 -->
+        <div class="position-card">
+            <div class="position-header">
+                <div class="lab-logo">
+                    <i class="bi bi-droplet-half"></i>
+                </div>
+            </div>
+            <div class="position-content">
+                <h3 class="position-title">Monitor de Química Orgánica</h3>
+                <div class="lab-info">
+                    <span class="lab-name">Lab. de Síntesis</span>
+                    <span class="position-location">
+                        <i class="bi bi-building"></i>Facultad de Química
+                    </span>
+                </div>
+                <div class="position-details">
+                    <div class="detail-item">
+                        <i class="bi bi-currency-euro"></i>
+                        <span>750€ - 1.100€/mes</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>20 horas/semana</span>
+                    </div>
+                </div>
+                <div class="position-skills">
+                    <span class="skill-tag">Síntesis</span>
+                    <span class="skill-tag">NMR</span>
+                    <span class="skill-tag">Purificación</span>
+                </div>
+            </div>
+            <div class="position-actions">
+                <button class="btn btn-primary">Aplicar</button>
+                <button class="btn btn-outline-secondary">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+<div class="pagination-section">
+    <nav aria-label="Navegación de convocatorias">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" aria-label="Anterior">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            <li class="page-item active">
+                <a class="page-link" href="#">1</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="#">2</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="#">3</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Siguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<style>
+/* Header Styles */
+.convocatorias-header {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.page-title i {
+    color: var(--primary-color);
+}
+
+.page-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.stats-summary {
+    display: flex;
+    gap: 2rem;
+    justify-content: flex-end;
+}
+
+.stats-summary .stat-item {
+    text-align: center;
+}
+
+.stats-summary .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.stats-summary .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Filters Styles */
+.filters-section {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    z-index: 2;
+}
+
+.search-box .form-control {
+    padding-left: 2.5rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.search-box .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
+}
+
+.form-select {
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
+}
+
+.quick-filters {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.quick-filter-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.quick-filter-btn:hover,
+.quick-filter-btn.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Featured Positions */
+.featured-positions-section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title i {
+    color: #fbbf24;
+}
+
+/* Position Cards */
+.position-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.position-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.featured-position {
+    border: 2px solid #fbbf24;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.position-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.lab-logo {
+    width: 50px;
+    height: 50px;
+    background: var(--primary-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.position-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-featured {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+}
+
+.badge-urgent {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.badge-new {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.badge-research {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+}
+
+.badge-weekly {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: white;
+}
+
+.badge-internship {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.position-content {
+    flex: 1;
+}
+
+.position-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.lab-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.lab-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.position-location {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.position-location i {
+    color: var(--primary-color);
+}
+
+.position-details {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.detail-item i {
+    color: var(--primary-color);
+}
+
+.position-skills {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.skill-tag {
+    background: rgba(30, 64, 175, 0.1);
+    color: var(--primary-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.position-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.position-actions .btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.position-actions .btn-primary {
+    flex: 1;
+}
+
+.position-actions .btn-outline-secondary {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+/* All Positions Section */
+.all-positions-section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.sort-options .form-select {
+    min-width: 200px;
+}
+
+.positions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Pagination */
+.pagination-section {
+    margin-top: 3rem;
+}
+
+.pagination .page-link {
+    border-radius: 8px;
+    margin: 0 0.25rem;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .stats-summary {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .quick-filters {
+        justify-content: center;
+    }
+    
+    .positions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .position-details {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .lab-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 576px) {
+    .convocatorias-header {
+        padding: 1.5rem;
+    }
+    
+    .filters-section {
+        padding: 1rem;
+    }
+    
+    .position-card {
+        padding: 1rem;
+    }
+    
+    .position-actions {
+        flex-direction: column;
+    }
+    
+    .position-actions .btn-primary {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+
+{% endblock %}

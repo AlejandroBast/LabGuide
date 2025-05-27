@@ -1,0 +1,1274 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Solicitar Acceso - LabGuides{% endblock %}
+
+{% block description %}Solicita acceso a LabGuides y únete a la comunidad académica. Accede a guías de laboratorio, protocolos y recursos universitarios especializados.{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<div class="register-container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-lg-11 col-xl-10">
+            <div class="register-card">
+                <div class="row g-0">
+                    <!-- Left Side - Form -->
+                    <div class="col-lg-7 register-form-section">
+                        <div class="form-container">
+                            <div class="form-header">
+                                <div class="brand-logo-small">
+                                    <div class="logo-container-small">
+                                        <i class="bi bi-mortarboard-fill"></i>
+                                    </div>
+                                    <span class="brand-name-small">LabGuides</span>
+                                </div>
+                                <h1 class="form-title">Solicitar Acceso Académico</h1>
+                                <p class="form-subtitle">Únete a la comunidad académica y accede a recursos especializados de laboratorio universitario</p>
+                            </div>
+                            
+                            <!-- Error Messages -->
+                            {% if form.errors %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <strong>Error en la Solicitud:</strong> Verifica la información académica proporcionada.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Success Messages -->
+                            {% if messages %}
+                                {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <form method="post" class="register-form" id="registerForm" novalidate>
+                                {% csrf_token %}
+                                
+                                <!-- Personal Information Section -->
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <i class="bi bi-person-vcard-fill me-2"></i>
+                                        Información Personal
+                                    </h3>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                                    <i class="bi bi-person me-2"></i>Nombre
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-person"></i>
+                                                    </span>
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                                                        id="{{ form.first_name.id_for_label }}"
+                                                        name="{{ form.first_name.name }}"
+                                                        value="{{ form.first_name.value|default_if_none:'' }}"
+                                                        placeholder="Tu nombre"
+                                                        required
+                                                        autocomplete="given-name"
+                                                    >
+                                                    <div class="input-feedback">
+                                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                                    </div>
+                                                </div>
+                                                {% if form.first_name.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.first_name.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                                    <i class="bi bi-person me-2"></i>Apellido
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-person"></i>
+                                                    </span>
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                                                        id="{{ form.last_name.id_for_label }}"
+                                                        name="{{ form.last_name.name }}"
+                                                        value="{{ form.last_name.value|default_if_none:'' }}"
+                                                        placeholder="Tu apellido"
+                                                        required
+                                                        autocomplete="family-name"
+                                                    >
+                                                    <div class="input-feedback">
+                                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                                    </div>
+                                                </div>
+                                                {% if form.last_name.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.last_name.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label">
+                                            <i class="bi bi-envelope-at-fill me-2"></i>Email Institucional
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-envelope-at"></i>
+                                            </span>
+                                            <input 
+                                                type="email" 
+                                                class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                                id="{{ form.email.id_for_label }}"
+                                                name="{{ form.email.name }}"
+                                                value="{{ form.email.value|default_if_none:'' }}"
+                                                placeholder="usuario@universidad.edu"
+                                                required
+                                                autocomplete="email"
+                                            >
+                                            <div class="input-feedback">
+                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Usa tu email institucional para verificación académica
+                                        </small>
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.email.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Academic Information Section -->
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <i class="bi bi-building-fill me-2"></i>
+                                        Información Académica
+                                    </h3>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="academic_role" class="form-label">
+                                                    <i class="bi bi-person-badge me-2"></i>Rol Académico
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-person-badge"></i>
+                                                    </span>
+                                                    <select class="form-control" id="academic_role" name="academic_role" required>
+                                                        <option value="">Selecciona tu rol</option>
+                                                        <option value="estudiante">Estudiante</option>
+                                                        <option value="profesor">Profesor</option>
+                                                        <option value="investigador">Investigador</option>
+                                                        <option value="tecnico">Técnico de Laboratorio</option>
+                                                        <option value="monitor">Monitor</option>
+                                                    </select>
+                                                    <div class="input-feedback">
+                                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="faculty" class="form-label">
+                                                    <i class="bi bi-building me-2"></i>Facultad
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-building"></i>
+                                                    </span>
+                                                    <select class="form-control" id="faculty" name="faculty" required>
+                                                        <option value="">Selecciona tu facultad</option>
+                                                        <option value="ciencias">Ciencias</option>
+                                                        <option value="ingenieria">Ingeniería</option>
+                                                        <option value="medicina">Medicina</option>
+                                                        <option value="quimica">Química</option>
+                                                        <option value="biologia">Biología</option>
+                                                        <option value="fisica">Física</option>
+                                                    </select>
+                                                    <div class="input-feedback">
+                                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="student_id" class="form-label">
+                                            <i class="bi bi-card-text me-2"></i>ID Académico / Código Estudiantil
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-card-text"></i>
+                                            </span>
+                                            <input 
+                                                type="text" 
+                                                class="form-control"
+                                                id="student_id"
+                                                name="student_id"
+                                                placeholder="Ej: 2023001234 o ID-PROF-001"
+                                                required
+                                            >
+                                            <div class="input-feedback">
+                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Código estudiantil o ID de empleado académico
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Account Information Section -->
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <i class="bi bi-shield-lock-fill me-2"></i>
+                                        Información de Cuenta
+                                    </h3>
+                                    
+                                    <div class="form-group">
+                                        <label for="{{ form.username.id_for_label }}" class="form-label">
+                                            <i class="bi bi-at me-2"></i>Usuario Académico
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-at"></i>
+                                            </span>
+                                            <input 
+                                                type="text" 
+                                                class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                                                id="{{ form.username.id_for_label }}"
+                                                name="{{ form.username.name }}"
+                                                value="{{ form.username.value|default_if_none:'' }}"
+                                                placeholder="usuario_academico"
+                                                required
+                                                autocomplete="username"
+                                            >
+                                            <div class="input-feedback">
+                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            Solo letras, números y guiones bajos. Mínimo 3 caracteres.
+                                        </small>
+                                        {% if form.username.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.username.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                                    <i class="bi bi-shield-lock-fill me-2"></i>Contraseña Académica
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-shield-lock"></i>
+                                                    </span>
+                                                    <input 
+                                                        type="password" 
+                                                        class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                                                        id="{{ form.password1.id_for_label }}"
+                                                        name="{{ form.password1.name }}"
+                                                        placeholder="Contraseña segura"
+                                                        required
+                                                        autocomplete="new-password"
+                                                    >
+                                                    <button class="btn btn-outline-secondary password-toggle" type="button" data-target="{{ form.password1.id_for_label }}">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <div class="input-feedback">
+                                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                                    </div>
+                                                </div>
+                                                {% if form.password1.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.password1.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                                    <i class="bi bi-shield-check-fill me-2"></i>Confirmar Contraseña
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-shield-check"></i>
+                                                    </span>
+                                                    <input 
+                                                        type="password" 
+                                                        class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                                                        id="{{ form.password2.id_for_label }}"
+                                                        name="{{ form.password2.name }}"
+                                                        placeholder="Repite la contraseña"
+                                                        required
+                                                        autocomplete="new-password"
+                                                    >
+                                                    <button class="btn btn-outline-secondary password-toggle" type="button" data-target="{{ form.password2.id_for_label }}">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <div class="input-feedback">
+                                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                                    </div>
+                                                </div>
+                                                {% if form.password2.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.password2.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Password Strength Indicator -->
+                                    <div class="password-strength">
+                                        <div class="strength-label">Seguridad de la contraseña:</div>
+                                        <div class="strength-bar">
+                                            <div class="strength-fill" id="strengthFill"></div>
+                                        </div>
+                                        <div class="strength-text" id="strengthText">Muy débil</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Terms and Conditions -->
+                                <div class="form-section">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="acceptTerms" name="accept_terms" required>
+                                        <label class="form-check-label" for="acceptTerms">
+                                            Acepto los <a href="#" class="terms-link">Términos de Uso Académico</a> y la 
+                                            <a href="#" class="terms-link">Política de Privacidad Universitaria</a>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="acceptAcademicPolicy" name="accept_academic_policy" required>
+                                        <label class="form-check-label" for="acceptAcademicPolicy">
+                                            Acepto las <a href="#" class="terms-link">Políticas de Uso de Laboratorio</a> y 
+                                            <a href="#" class="terms-link">Normas de Seguridad</a>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="acceptNotifications" name="accept_notifications">
+                                        <label class="form-check-label" for="acceptNotifications">
+                                            Quiero recibir notificaciones sobre nuevas guías y actualizaciones académicas
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary btn-register w-100">
+                                    <span class="btn-text">
+                                        <i class="bi bi-door-open-fill me-2"></i>
+                                        Solicitar Acceso Académico
+                                    </span>
+                                    <span class="btn-loading" style="display: none;">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        Procesando solicitud...
+                                    </span>
+                                </button>
+                            </form>
+                            
+                            <!-- Academic Registration -->
+                            <div class="academic-register">
+                                <div class="divider">
+                                    <span>O solicita acceso con</span>
+                                </div>
+                                
+                                <div class="academic-buttons">
+                                    <button class="btn btn-academic btn-university">
+                                        <i class="bi bi-building"></i>
+                                        <span>Portal Universitario</span>
+                                    </button>
+                                    <button class="btn btn-academic btn-student">
+                                        <i class="bi bi-mortarboard"></i>
+                                        <span>Sistema Estudiantil</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Login Link -->
+                            <div class="login-prompt">
+                                <p>¿Ya tienes acceso académico? 
+                                    <a href="{% url 'login' %}" class="login-link">Inicia sesión aquí</a>
+                                </p>
+                            </div>
+                            
+                            <!-- Back to Home -->
+                            <div class="back-home">
+                                <a href="{% url 'home' %}" class="back-link">
+                                    <i class="bi bi-arrow-left me-2"></i>Volver al portal principal
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side - Academic Benefits -->
+                    <div class="col-lg-5 register-benefits">
+                        <div class="benefits-content">
+                            <div class="benefits-header">
+                                <h2 class="benefits-title">¿Por qué unirse a LabGuides?</h2>
+                                <p class="benefits-subtitle">
+                                    Descubre todas las ventajas de formar parte de nuestra comunidad académica universitaria
+                                </p>
+                            </div>
+                            
+                            <div class="benefits-list">
+                                <div class="benefit-item">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-flask"></i>
+                                    </div>
+                                    <div class="benefit-content">
+                                        <h4>Guías de Laboratorio Actualizadas</h4>
+                                        <p>Accede a más de 150 protocolos y metodologías validadas por expertos académicos.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="benefit-item">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-calendar-week"></i>
+                                    </div>
+                                    <div class="benefit-content">
+                                        <h4>Organización Semanal</h4>
+                                        <p>Contenido estructurado por semanas académicas para un aprendizaje progresivo.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="benefit-item">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-people-fill"></i>
+                                    </div>
+                                    <div class="benefit-content">
+                                        <h4>Colaboración Académica</h4>
+                                        <p>Conecta con profesores, investigadores y estudiantes de tu área de estudio.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="benefit-item">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-shield-check-fill"></i>
+                                    </div>
+                                    <div class="benefit-content">
+                                        <h4>Seguridad y Normativas</h4>
+                                        <p>Protocolos de seguridad actualizados y cumplimiento de normativas universitarias.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="benefit-item">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-chat-square-text-fill"></i>
+                                    </div>
+                                    <div class="benefit-content">
+                                        <h4>Foro Académico</h4>
+                                        <p>Participa en discusiones especializadas y comparte experiencias de laboratorio.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="benefit-item">
+                                    <div class="benefit-icon">
+                                        <i class="bi bi-award-fill"></i>
+                                    </div>
+                                    <div class="benefit-content">
+                                        <h4>Certificaciones</h4>
+                                        <p>Obtén certificados de competencia en técnicas y metodologías de laboratorio.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="testimonial">
+                                <div class="testimonial-content">
+                                    <i class="bi bi-quote"></i>
+                                    <p>"LabGuides transformó mi experiencia en el laboratorio. Los protocolos son claros y las discusiones académicas muy enriquecedoras."</p>
+                                </div>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">
+                                        <i class="bi bi-person-circle"></i>
+                                    </div>
+                                    <div class="author-info">
+                                        <div class="author-name">Dr. Ana Martínez</div>
+                                        <div class="author-role">Profesora de Química Analítica</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Register Container */
+.register-container {
+    background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.register-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="academic-pattern" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.1)"/><rect x="20" y="20" width="10" height="10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23academic-pattern)"/></svg>');
+    opacity: 0.4;
+}
+
+.register-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Left Side - Form */
+.register-form-section {
+    padding: 3rem 2rem;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.brand-logo-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    gap: 0.75rem;
+}
+
+.logo-container-small {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.brand-name-small {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.form-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Form Sections */
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+/* Form Styles */
+.register-form {
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-group-text {
+    background: var(--light-bg);
+    border: 1px solid var(--border-color);
+    border-right: none;
+    color: var(--primary-color);
+    border-radius: 8px 0 0 8px;
+}
+
+.form-control {
+    border: 1px solid var(--border-color);
+    border-radius: 0 8px 8px 0;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.form-control.is-valid {
+    border-color: #28a745;
+}
+
+.input-feedback {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    z-index: 3;
+}
+
+.form-control:valid:not([type="password"]) ~ .input-feedback,
+.form-control:valid + .password-toggle + .input-feedback {
+    display: block;
+}
+
+.password-toggle {
+    border: 1px solid var(--border-color);
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    background: white;
+    color: var(--text-secondary);
+    z-index: 2;
+}
+
+.password-toggle:hover {
+    background: var(--light-bg);
+    color: var(--primary-color);
+}
+
+.form-text {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Password Strength */
+.password-strength {
+    margin-top: 1rem;
+}
+
+.strength-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.strength-bar {
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.strength-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Checkboxes */
+.form-check {
+    margin-bottom: 1rem;
+}
+
+.form-check-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.terms-link {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.terms-link:hover {
+    text-decoration: underline;
+}
+
+/* Submit Button */
+.btn-register {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-register:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+}
+
+.btn-register:active {
+    transform: translateY(0);
+}
+
+/* Academic Registration */
+.academic-register {
+    margin-bottom: 2rem;
+}
+
+.divider {
+    text-align: center;
+    margin: 2rem 0 1.5rem;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.divider span {
+    background: white;
+    padding: 0 1rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    position: relative;
+}
+
+.academic-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-academic {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: white;
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-academic:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-university:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-student:hover {
+    border-color: #059669;
+    color: #059669;
+}
+
+/* Login Prompt */
+.login-prompt {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.login-prompt p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.login-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+/* Back Home */
+.back-home {
+    text-align: center;
+}
+
+.back-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.back-link:hover {
+    color: var(--primary-color);
+}
+
+/* Right Side - Academic Benefits */
+.register-benefits {
+    background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+    color: white;
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.register-benefits::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -30%;
+    width: 80%;
+    height: 160%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: academicFloat 8s ease-in-out infinite;
+}
+
+.benefits-content {
+    position: relative;
+    z-index: 1;
+}
+
+.benefits-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.benefits-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.benefits-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.benefits-list {
+    margin-bottom: 2rem;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.benefit-icon {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.125rem;
+    flex-shrink: 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.benefit-content h4 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: white;
+    font-size: 1rem;
+}
+
+.benefit-content p {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Testimonial */
+.testimonial {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.testimonial-content {
+    margin-bottom: 1rem;
+}
+
+.testimonial-content i {
+    font-size: 2rem;
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+}
+
+.testimonial-content p {
+    font-style: italic;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.author-avatar {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.author-name {
+    font-weight: 600;
+    color: white;
+}
+
+.author-role {
+    font-size: 0.875rem;
+    opacity: 0.8;
+}
+
+/* Animations */
+@keyframes academicFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .register-benefits {
+        order: 1;
+        padding: 2rem;
+    }
+    
+    .register-form-section {
+        order: 2;
+        padding: 2rem;
+        max-height: none;
+    }
+    
+    .benefits-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .register-container {
+        padding: 1rem;
+    }
+    
+    .register-card {
+        border-radius: 15px;
+    }
+    
+    .register-benefits,
+    .register-form-section {
+        padding: 1.5rem;
+    }
+    
+    .form-title {
+        font-size: 1.75rem;
+    }
+    
+    .benefits-title {
+        font-size: 1.5rem;
+    }
+    
+    .academic-buttons {
+        flex-direction: column;
+    }
+    
+    .benefits-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .form-section {
+        padding-bottom: 1rem;
+    }
+    
+    .benefit-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .benefit-icon {
+        margin: 0 auto 1rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle functionality
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const passwordInput = document.getElementById(targetId);
+            
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            if (type === 'password') {
+                icon.className = 'bi bi-eye';
+            } else {
+                icon.className = 'bi bi-eye-slash';
+            }
+        });
+    });
+    
+    // Password strength checker
+    const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    if (password1 && strengthFill && strengthText) {
+        password1.addEventListener('input', function() {
+            const password = this.value;
+            const strength = calculatePasswordStrength(password);
+            
+            strengthFill.style.width = strength.percentage + '%';
+            strengthFill.style.backgroundColor = strength.color;
+            strengthText.textContent = strength.text;
+            strengthText.style.color = strength.color;
+        });
+    }
+    
+    function calculatePasswordStrength(password) {
+        let score = 0;
+        
+        if (password.length >= 8) score += 25;
+        if (password.match(/[a-z]/)) score += 25;
+        if (password.match(/[A-Z]/)) score += 25;
+        if (password.match(/[0-9]/)) score += 15;
+        if (password.match(/[^a-zA-Z0-9]/)) score += 10;
+        
+        if (score < 30) {
+            return { percentage: score, color: '#dc3545', text: 'Muy débil' };
+        } else if (score < 60) {
+            return { percentage: score, color: '#fd7e14', text: 'Débil' };
+        } else if (score < 80) {
+            return { percentage: score, color: '#ffc107', text: 'Buena' };
+        } else {
+            return { percentage: score, color: '#28a745', text: 'Fuerte' };
+        }
+    }
+    
+    // Form validation
+    const form = document.getElementById('registerForm');
+    const inputs = form.querySelectorAll('input[required], select[required]');
+    
+    inputs.forEach(input => {
+        input.addEventListener('blur', validateField);
+        input.addEventListener('input', validateField);
+        input.addEventListener('change', validateField);
+    });
+    
+    function validateField(e) {
+        const field = e.target;
+        const isValid = field.checkValidity();
+        
+        if (isValid) {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+        } else {
+            field.classList.remove('is-valid');
+            if (field.value.length > 0) {
+                field.classList.add('is-invalid');
+            }
+        }
+    }
+    
+    // Password confirmation validation
+    const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+    if (password1 && password2) {
+        password2.addEventListener('input', function() {
+            if (this.value !== password1.value) {
+                this.setCustomValidity('Las contraseñas no coinciden');
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else {
+                this.setCustomValidity('');
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    }
+    
+    // Form submission with loading state
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('.btn-register');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+        const acceptTerms = document.getElementById('acceptTerms');
+        const acceptAcademicPolicy = document.getElementById('acceptAcademicPolicy');
+        
+        // Check terms acceptance
+        if (!acceptTerms.checked || !acceptAcademicPolicy.checked) {
+            e.preventDefault();
+            alert('Debes aceptar los términos académicos y políticas de laboratorio para continuar.');
+            return;
+        }
+        
+        // Show loading state
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline-flex';
+        submitBtn.disabled = true;
+        
+        // Validate form
+        let isValid = true;
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                isValid = false;
+                input.classList.add('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Reset button state
+            btnText.style.display = 'inline-flex';
+            btnLoading.style.display = 'none';
+            submitBtn.disabled = false;
+        }
+    });
+    
+    // Auto-dismiss alerts
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            if (alert && alert.parentNode) {
+                alert.classList.remove('show');
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.remove();
+                    }
+                }, 150);
+            }
+        }, 5000);
+    });
+    
+    // Academic buttons functionality
+    const academicButtons = document.querySelectorAll('.btn-academic');
+    academicButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const buttonType = this.classList.contains('btn-university') ? 'university' : 'student';
+            console.log('Academic registration type:', buttonType);
+            // Here you would implement the actual academic registration logic
+        });
+    });
+});
+</script>
+
+{% endblock %}

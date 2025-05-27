@@ -1,0 +1,804 @@
+{% extends 'core/base.html' %}
+
+{% block title %}LabGuides - Sistema de Gestión de Guías de Laboratorio Universitarias{% endblock %}
+
+{% block description %}Plataforma académica para gestionar guías de laboratorio universitarias organizadas por temáticas semanales. Herramienta para docentes, monitores y estudiantes.{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="row align-items-center min-vh-75">
+        <div class="col-lg-6 order-lg-1 order-2">
+            <div class="hero-content">
+                {% if request.user.is_authenticated %}
+                    <div class="welcome-badge">
+                        <i class="bi bi-mortarboard-fill"></i>
+                        <span>¡Bienvenido al Gestor de Laboratorios!</span>
+                    </div>
+                    <h1 class="hero-title">
+                        Hola <span class="text-primary">{{ user.get_full_name|default:user.username|title }}</span>,<br>
+                        ¿Listo para la <span class="text-gradient">práctica de hoy</span>?
+                    </h1>
+                    <p class="hero-subtitle">
+                        Accede a las guías de laboratorio de esta semana, consulta los protocolos experimentales y gestiona tus actividades académicas.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="{% url 'publicaciones' %}" class="btn btn-primary btn-lg me-3">
+                            <i class="bi bi-journal-medical me-2"></i>Ver Guías Semanales
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-calendar-week me-2"></i>Cronograma
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="welcome-badge">
+                        <i class="bi bi-award-fill"></i>
+                        <span>Plataforma Especializada en Gestión de Laboratorio</span>
+                    </div>
+                    <h1 class="hero-title">
+                        Gestiona tu <span class="text-gradient">laboratorio universitario</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        LabGuides es la plataforma que organiza guías de laboratorio por temáticas semanales. 
+                        Crea protocolos, gestiona experimentos y facilita el aprendizaje práctico de tus estudiantes.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-3">
+                            <i class="bi bi-person-plus-fill me-2"></i>Registro Docente
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Acceso al Sistema
+                        </a>
+                    </div>
+                {% endif %}
+                
+                <!-- Stats -->
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">10+</span>
+                        <div class="stat-label">Guías de Lab</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Laboratorios</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label">Satisfacción</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 order-lg-2 order-1">
+            <div class="hero-image">
+                <div class="image-container">
+                    <img src="{% static 'images/logo.jpg' %}" alt="LabGuides - Sistema de Gestión de Laboratorio" class="main-logo">
+                    <div class="floating-cards">
+                        <div class="floating-card card-1">
+                            <i class="bi bi-flask"></i>
+                            <span>Experimentos</span>
+                        </div>
+                        <div class="floating-card card-2">
+                            <i class="bi bi-calendar-week"></i>
+                            <span>Semana 8</span>
+                        </div>
+                        <div class="floating-card card-3">
+                            <i class="bi bi-clipboard-data"></i>
+                            <span>Protocolos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h2 class="section-title">¿Por qué elegir LabGuides?</h2>
+            <p class="section-subtitle">Descubre las ventajas que nos hacen la plataforma preferida por docentes universitarios</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-calendar-week"></i>
+                </div>
+                <h3 class="feature-title">Organización Semanal</h3>
+                <p class="feature-description">
+                    Organiza tus guías de laboratorio por semanas académicas. 
+                    Cada semana tiene su temática específica con experimentos y protocolos asociados.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-activity"></i>
+                </div>
+                <h3 class="feature-title">Protocolos Verificados</h3>
+                <p class="feature-description">
+                    Todos los protocolos y procedimientos son revisados por docentes expertos. 
+                    Garantizamos la seguridad y precisión de cada experimento.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <h3 class="feature-title">Seguimiento Académico</h3>
+                <p class="feature-description">
+                    Monitorea el progreso de tus estudiantes, evalúa resultados 
+                    y genera reportes de desempeño en las prácticas de laboratorio.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Weekly Themes Section -->
+<section class="weekly-themes-section py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h2 class="section-title">Temáticas Semanales Actuales</h2>
+            <p class="section-subtitle">Explora las temáticas de laboratorio programadas para esta semana</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+            <div class="col-md-4">
+                <h4 class="theme-title">Química Analítica</h4>
+                <p class="theme-description">Técnicas de titulación y análisis cuantitativo</p>
+                <div class="theme-status active">En Curso</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="theme-card">
+                <div class="theme-week">Semana 9</div>
+                <div class="theme-icon">
+                    <i class="bi bi-cpu-fill"></i>
+                </div>
+                <h4 class="theme-title">Física Moderna</h4>
+                <p class="theme-description">Experimentos de mecánica cuántica</p>
+                <div class="theme-status upcoming">Próxima</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="theme-card">
+                <div class="theme-week">Semana 10</div>
+                <div class="theme-icon">
+                    <i class="bi bi-tree-fill"></i>
+                </div>
+                <h4 class="theme-title">Biología Molecular</h4>
+                <p class="theme-description">Extracción y análisis de ADN</p>
+                <div class="theme-status upcoming">Próxima</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="theme-card">
+                <div class="theme-week">Semana 11</div>
+                <div class="theme-icon">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+                <h4 class="theme-title">Electromagnetismo</h4>
+                <p class="theme-description">Campos eléctricos y magnéticos</p>
+                <div class="theme-status upcoming">Próxima</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+{% if not request.user.is_authenticated %}
+<section class="cta-section">
+    <div class="cta-container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="cta-title">¿Listo para modernizar tu laboratorio?</h2>
+                <p class="cta-subtitle">
+                    Únete a cientos de docentes que ya organizan sus prácticas de laboratorio con LabGuides.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg">
+                    <i class="bi bi-flask me-2"></i>Comenzar Ahora
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Testimonials Section -->
+<section class="testimonials-section py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h2 class="section-title">Lo que dicen nuestros docentes</h2>
+            <p class="section-subtitle">Experiencias reales de éxito académico</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p>"LabGuides revolucionó la organización de mis prácticas. Los estudiantes ahora siguen mejor los protocolos."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="author-info">
+                        <div class="author-name">Dra. Ana Martínez</div>
+                        <div class="author-role">Profesora de Química</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p>"La organización semanal me permite planificar mejor el semestre. Mis estudiantes están más preparados."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <i class="bi bi-mortarboard"></i>
+                    </div>
+                    <div class="author-info">
+                        <div class="author-name">Dr. Carlos Ruiz</div>
+                        <div class="author-role">Profesor de Física</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p>"Como monitor, LabGuides me facilita preparar las prácticas y dar soporte a los estudiantes."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="author-info">
+                        <div class="author-name">María González</div>
+                        <div class="author-role">Monitor de Biología</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Hero Section Styles */
+.hero-section {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    margin-bottom: 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(30, 64, 175, 0.1) 0%, transparent 70%);
+    animation: float 6s ease-in-out infinite;
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.welcome-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    animation: slideInDown 0.8s ease-out;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    animation: slideInLeft 0.8s ease-out 0.2s both;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #1e40af, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    animation: slideInLeft 0.8s ease-out 0.4s both;
+}
+
+.hero-actions {
+    margin-bottom: 3rem;
+    animation: slideInUp 0.8s ease-out 0.6s both;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    animation: slideInUp 0.8s ease-out 0.8s both;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Hero Image Styles */
+.hero-image {
+    position: relative;
+    animation: slideInRight 0.8s ease-out 0.4s both;
+}
+
+.image-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-logo {
+    width: 300px;
+    height: 300px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.main-logo:hover {
+    transform: scale(1.05);
+}
+
+.floating-cards {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.floating-card {
+    position: absolute;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-card i {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+}
+
+.card-1 {
+    top: 10%;
+    right: -10%;
+    animation-delay: 0s;
+}
+
+.card-2 {
+    bottom: 30%;
+    left: -15%;
+    animation-delay: 1s;
+}
+
+.card-3 {
+    top: 60%;
+    right: 10%;
+    animation-delay: 2s;
+}
+
+/* Features Section */
+.features-section {
+    margin: 4rem 0;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    height: 100%;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 2rem;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.feature-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Weekly Themes Section */
+.weekly-themes-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    margin: 4rem 0;
+}
+
+.theme-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    height: 100%;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.theme-week {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.theme-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.theme-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.theme-description {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.theme-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.theme-status.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.theme-status.upcoming {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary-color), #1e3a8a);
+    border-radius: 20px;
+    margin: 4rem 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+}
+
+.cta-container {
+    padding: 3rem 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.cta-subtitle {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+    margin: 4rem 0;
+}
+
+.testimonial-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.testimonial-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.testimonial-content {
+    margin-bottom: 1.5rem;
+}
+
+.stars {
+    color: #fbbf24;
+    margin-bottom: 1rem;
+    font-size: 1.125rem;
+}
+
+.testimonial-content p {
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    background: var(--light-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.author-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.author-role {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-stats {
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .main-logo {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .floating-card {
+        font-size: 0.875rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .card-1, .card-2, .card-3 {
+        position: static;
+        margin: 0.5rem;
+        display: inline-flex;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .cta-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        padding: 2rem 1rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-actions .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-actions .btn:last-child {
+        margin-bottom: 0;
+    }
+    
+    .weekly-themes-section {
+        padding: 2rem 1rem;
+    }
+}
+</style>
+
+{% endblock %}
+

@@ -1,0 +1,1230 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Foro Académico - LabGuides{% endblock %}
+
+{% block description %}Comparte experiencias de laboratorio, discute metodologías y colabora con la comunidad académica en LabGuides.{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<!-- Header Section -->
+<div class="foro-header">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <h1 class="page-title">
+                <i class="bi bi-chat-square-text-fill me-3"></i>
+                Foro Académico
+            </h1>
+            <p class="page-subtitle">
+                Comparte experiencias de laboratorio, discute metodologías y colabora con la comunidad académica
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <span class="stat-number">{{ posts.count|default:"0" }}</span>
+                    <span class="stat-label">Discusiones</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">8</span>
+                    <span class="stat-label">Hoy</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <!-- Create Post Section -->
+        {% if request.user.is_authenticated %}
+        <div class="create-discussion-card">
+            <div class="create-discussion-header">
+                <div class="user-avatar">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <div class="user-info">
+                    <h5 class="user-name">{{ request.user.get_full_name|default:request.user.username }}</h5>
+                    <small class="user-role">Comparte una experiencia o pregunta académica</small>
+                </div>
+            </div>
+            
+            <form method="POST" class="create-discussion-form" id="discussionForm">
+                {% csrf_token %}
+                <div class="discussion-input-container">
+                    <textarea 
+                        name="{{ form.content.name }}" 
+                        class="discussion-textarea" 
+                        placeholder="¿Qué experiencia de laboratorio quieres compartir? ¿Tienes alguna pregunta sobre metodologías o protocolos?"
+                        rows="3"
+                        maxlength="800"
+                    >{{ form.content.value|default_if_none:"" }}</textarea>
+                    <div class="character-count">
+                        <span id="charCount">0</span>/800
+                    </div>
+                </div>
+                
+                <div class="discussion-actions">
+                    <div class="discussion-options">
+                        <button type="button" class="option-btn" title="Añadir protocolo">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>Protocolo</span>
+                        </button>
+                        <button type="button" class="option-btn" title="Añadir imagen de resultados">
+                            <i class="bi bi-image"></i>
+                            <span>Resultados</span>
+                        </button>
+                        <button type="button" class="option-btn" title="Etiquetar laboratorio">
+                            <i class="bi bi-tag"></i>
+                            <span>Laboratorio</span>
+                        </button>
+                    </div>
+                    <button type="submit" class="btn btn-primary discussion-btn" disabled>
+                        <i class="bi bi-send-fill me-2"></i>Publicar
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <div class="login-prompt-card">
+            <div class="login-prompt-content">
+                <i class="bi bi-mortarboard-fill"></i>
+                <h3>¡Únete a la comunidad académica!</h3>
+                <p>Inicia sesión para compartir experiencias de laboratorio y participar en discusiones académicas</p>
+                <div class="login-actions">
+                    <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-primary">Registrarse</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Filter Options -->
+        <div class="filter-section">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">
+                    <i class="bi bi-grid-3x3-gap-fill me-2"></i>Todas
+                </button>
+                <button class="filter-tab" data-filter="recent">
+                    <i class="bi bi-clock-fill me-2"></i>Recientes
+                </button>
+                <button class="filter-tab" data-filter="popular">
+                    <i class="bi bi-star-fill me-2"></i>Destacadas
+                </button>
+                <button class="filter-tab" data-filter="questions">
+                    <i class="bi bi-question-circle-fill me-2"></i>Preguntas
+                </button>
+                <button class="filter-tab" data-filter="protocols">
+                    <i class="bi bi-file-earmark-text-fill me-2"></i>Protocolos
+                </button>
+            </div>
+        </div>
+
+        <!-- Discussions Feed -->
+        <div class="discussions-feed">
+            {% for post in posts %}
+            <article class="discussion-card" data-post-id="{{ post.id }}">
+                <div class="discussion-header">
+                    <div class="discussion-author">
+                        <div class="author-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div class="author-info">
+                            <h6 class="author-name">{{ post.user.get_full_name|default:post.user.username }}</h6>
+                            <small class="author-role">Estudiante de Química</small>
+                            <small class="discussion-time">
+                                <i class="bi bi-clock me-1"></i>
+                                {{ post.created_at|timesince }} ago
+                            </small>
+                        </div>
+                    </div>
+                    <div class="discussion-menu">
+                        <button class="menu-btn" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            {% if post.user == request.user %}
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Editar</a></li>
+                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Eliminar</a></li>
+                            {% else %}
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-flag me-2"></i>Reportar</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-share me-2"></i>Compartir</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="discussion-content">
+                    <p class="discussion-text">{{ post.content|linebreaks }}</p>
+                    <div class="discussion-tags">
+                        <span class="tag-item">Química Analítica</span>
+                        <span class="tag-item">Semana 8</span>
+                        <span class="tag-item">HPLC</span>
+                    </div>
+                </div>
+                
+                <div class="discussion-engagement">
+                    <div class="engagement-stats">
+                        <span class="stat-item">
+                            <i class="bi bi-hand-thumbs-up-fill text-success"></i>
+                            <span class="count">{{ post.likes_count|default:"0" }}</span>
+                        </span>
+                        <span class="stat-item">
+                            <i class="bi bi-chat-fill text-primary"></i>
+                            <span class="count">{{ post.comments_count|default:"0" }}</span>
+                        </span>
+                        <span class="stat-item">
+                            <i class="bi bi-bookmark-fill text-warning"></i>
+                            <span class="count">{{ post.saves_count|default:"0" }}</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="discussion-actions">
+                    <button class="action-btn like-btn" data-action="like">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                        <span>Útil</span>
+                    </button>
+                    <button class="action-btn comment-btn" data-action="comment">
+                        <i class="bi bi-chat"></i>
+                        <span>Responder</span>
+                    </button>
+                    <button class="action-btn save-btn" data-action="save">
+                        <i class="bi bi-bookmark"></i>
+                        <span>Guardar</span>
+                    </button>
+                </div>
+                
+                <!-- Comments Section (Initially Hidden) -->
+                <div class="comments-section" style="display: none;">
+                    <div class="comments-list">
+                        <!-- Sample comments - replace with actual Django loop -->
+                        <div class="comment-item">
+                            <div class="comment-avatar">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <span class="comment-author">Dr. María González</span>
+                                    <span class="comment-role">Profesora</span>
+                                    <span class="comment-time">2h</span>
+                                </div>
+                                <p class="comment-text">Excelente observación sobre la calibración del HPLC. Te recomiendo revisar el protocolo de la semana 6 para optimizar los parámetros.</p>
+                            </div>
+                        </div>
+                        <div class="comment-item">
+                            <div class="comment-avatar">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <span class="comment-author">Ana Martínez</span>
+                                    <span class="comment-role">Estudiante</span>
+                                    <span class="comment-time">1h</span>
+                                </div>
+                                <p class="comment-text">Tuve el mismo problema la semana pasada. ¿Verificaste la temperatura de la columna?</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if request.user.is_authenticated %}
+                    <div class="comment-form">
+                        <div class="comment-input-container">
+                            <div class="comment-avatar">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <input type="text" class="comment-input" placeholder="Comparte tu experiencia o consejo...">
+                            <button class="comment-submit-btn">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-content">
+                    <i class="bi bi-chat-square-text"></i>
+                    <h3>No hay discusiones aún</h3>
+                    <p>Sé el primero en compartir una experiencia de laboratorio o hacer una pregunta académica</p>
+                    {% if request.user.is_authenticated %}
+                    <button class="btn btn-primary" onclick="document.querySelector('.discussion-textarea').focus()">
+                        <i class="bi bi-plus-circle me-2"></i>Iniciar Primera Discusión
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="sidebar">
+            <!-- Weekly Topics -->
+            <div class="sidebar-card">
+                <h5 class="sidebar-title">
+                    <i class="bi bi-calendar-week me-2"></i>Temas Semanales
+                </h5>
+                <div class="weekly-topics-list">
+                    <div class="topic-item active">
+                        <span class="topic-week">Semana 8</span>
+                        <span class="topic-name">Química Analítica</span>
+                        <small class="topic-discussions">24 discusiones</small>
+                    </div>
+                    <div class="topic-item">
+                        <span class="topic-week">Semana 9</span>
+                        <span class="topic-name">Espectroscopía</span>
+                        <small class="topic-discussions">18 discusiones</small>
+                    </div>
+                    <div class="topic-item">
+                        <span class="topic-week">Semana 10</span>
+                        <span class="topic-name">Síntesis Orgánica</span>
+                        <small class="topic-discussions">15 discusiones</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Popular Tags -->
+            <div class="sidebar-card">
+                <h5 class="sidebar-title">
+                    <i class="bi bi-tags me-2"></i>Etiquetas Populares
+                </h5>
+                <div class="tags-list">
+                    <div class="tag-item">
+                        <span class="tag-name">#HPLC</span>
+                        <small class="tag-count">45 discusiones</small>
+                    </div>
+                    <div class="tag-item">
+                        <span class="tag-name">#Titulación</span>
+                        <small class="tag-count">38 discusiones</small>
+                    </div>
+                    <div class="tag-item">
+                        <span class="tag-name">#Microscopía</span>
+                        <small class="tag-count">32 discusiones</small>
+                    </div>
+                    <div class="tag-item">
+                        <span class="tag-name">#Seguridad</span>
+                        <small class="tag-count">28 discusiones</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Active Contributors -->
+            <div class="sidebar-card">
+                <h5 class="sidebar-title">
+                    <i class="bi bi-people me-2"></i>Colaboradores Activos
+                </h5>
+                <div class="contributors-list">
+                    <div class="contributor-item">
+                        <div class="contributor-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div class="contributor-info">
+                            <h6 class="contributor-name">Dr. Ana Martínez</h6>
+                            <small class="contributor-role">Profesora de Química</small>
+                            <small class="contributor-stats">156 respuestas útiles</small>
+                        </div>
+                        <div class="contributor-badge">
+                            <i class="bi bi-award-fill text-warning"></i>
+                        </div>
+                    </div>
+                    <div class="contributor-item">
+                        <div class="contributor-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <div class="contributor-info">
+                            <h6 class="contributor-name">Carlos Ruiz</h6>
+                            <small class="contributor-role">Estudiante de Doctorado</small>
+                            <small class="contributor-stats">89 respuestas útiles</small>
+                        </div>
+                        <div class="contributor-badge">
+                            <i class="bi bi-star-fill text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Lab Activity -->
+            <div class="sidebar-card">
+                <h5 class="sidebar-title">
+                    <i class="bi bi-activity me-2"></i>Actividad Reciente
+                </h5>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <i class="bi bi-hand-thumbs-up-fill text-success"></i>
+                        <span>Tu respuesta sobre <strong>calibración de pH</strong> fue marcada como útil</span>
+                        <small>2h</small>
+                    </div>
+                    <div class="activity-item">
+                        <i class="bi bi-chat-fill text-primary"></i>
+                        <span><strong>Dr. López</strong> respondió a tu pregunta sobre HPLC</span>
+                        <small>4h</small>
+                    </div>
+                    <div class="activity-item">
+                        <i class="bi bi-bookmark-fill text-warning"></i>
+                        <span>Guardaste el protocolo de <strong>Síntesis de Aspirina</strong></span>
+                        <small>6h</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Header Styles */
+.foro-header {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.page-title i {
+    color: var(--primary-color);
+}
+
+.page-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.stats-summary {
+    display: flex;
+    gap: 2rem;
+    justify-content: flex-end;
+}
+
+.stats-summary .stat-item {
+    text-align: center;
+}
+
+.stats-summary .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.stats-summary .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Create Discussion Card */
+.create-discussion-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.create-discussion-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.user-role {
+    color: var(--text-secondary);
+}
+
+.discussion-input-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.discussion-textarea {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 100px;
+    transition: all 0.2s ease;
+}
+
+.discussion-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
+}
+
+.character-count {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.discussion-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.discussion-options {
+    display: flex;
+    gap: 1rem;
+}
+
+.option-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.option-btn:hover {
+    background-color: var(--light-bg);
+    color: var(--primary-color);
+}
+
+.discussion-btn {
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+}
+
+.discussion-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Login Prompt */
+.login-prompt-card {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 15px;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    border: 1px solid #bae6fd;
+}
+
+.login-prompt-content i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.login-prompt-content h3 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.login-prompt-content p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+.login-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Filter Section */
+.filter-section {
+    margin-bottom: 2rem;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+.filter-tab {
+    background: none;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.filter-tab:hover,
+.filter-tab.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Discussion Cards */
+.discussions-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.discussion-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.discussion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.discussion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.discussion-author {
+    display: flex;
+    align-items: center;
+}
+
+.author-avatar {
+    width: 45px;
+    height: 45px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+}
+
+.author-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.author-role {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    display: block;
+}
+
+.discussion-time {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.menu-btn:hover {
+    background-color: var(--light-bg);
+    color: var(--text-primary);
+}
+
+.discussion-content {
+    margin-bottom: 1rem;
+}
+
+.discussion-text {
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.discussion-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag-item {
+    background: rgba(30, 64, 175, 0.1);
+    color: var(--primary-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.discussion-engagement {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.engagement-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.discussion-actions {
+    display: flex;
+    justify-content: space-around;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.action-btn:hover {
+    background-color: var(--light-bg);
+    color: var(--primary-color);
+}
+
+.action-btn.liked {
+    color: #10b981;
+}
+
+.action-btn.saved {
+    color: #f59e0b;
+}
+
+/* Comments Section */
+.comments-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.comment-item {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.comment-avatar {
+    width: 35px;
+    height: 35px;
+    background: var(--light-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.comment-role {
+    color: var(--primary-color);
+    font-size: 0.75rem;
+    background: rgba(30, 64, 175, 0.1);
+    padding: 0.125rem 0.5rem;
+    border-radius: 10px;
+}
+
+.comment-time {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+.comment-text {
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.comment-form {
+    margin-top: 1rem;
+}
+
+.comment-input-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.comment-input {
+    flex: 1;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+}
+
+.comment-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.comment-submit-btn {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.comment-submit-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Sidebar */
+.sidebar {
+    position: sticky;
+    top: 100px;
+}
+
+.sidebar-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.sidebar-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.topic-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.topic-item:hover {
+    background-color: var(--light-bg);
+    margin: 0 -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 8px;
+}
+
+.topic-item.active {
+    background-color: rgba(30, 64, 175, 0.1);
+    margin: 0 -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 8px;
+}
+
+.topic-item:last-child {
+    border-bottom: none;
+}
+
+.topic-week {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.topic-name {
+    color: var(--text-primary);
+    font-weight: 500;
+    margin: 0.25rem 0;
+}
+
+.topic-discussions {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+.tag-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tag-item:last-child {
+    border-bottom: none;
+}
+
+.tag-name {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.tag-count {
+    color: var(--text-secondary);
+}
+
+.contributor-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.contributor-item:last-child {
+    border-bottom: none;
+}
+
+.contributor-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--light-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+}
+
+.contributor-info {
+    flex: 1;
+}
+
+.contributor-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.contributor-role {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    display: block;
+}
+
+.contributor-stats {
+    color: var(--primary-color);
+    font-size: 0.75rem;
+    display: block;
+}
+
+.contributor-badge {
+    font-size: 1.25rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.875rem;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-item i {
+    margin-top: 0.125rem;
+}
+
+.activity-item small {
+    color: var(--text-secondary);
+    margin-left: auto;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-state-content i {
+    font-size: 4rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.empty-state-content h3 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.empty-state-content p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .stats-summary {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .filter-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+    
+    .discussion-actions {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .login-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .sidebar {
+        position: static;
+        margin-top: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .foro-header {
+        padding: 1.5rem;
+    }
+    
+    .create-discussion-card {
+        padding: 1rem;
+    }
+    
+    .discussion-card {
+        padding: 1rem;
+    }
+    
+    .discussion-options {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .option-btn span {
+        display: none;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Character counter for discussion textarea
+    const textarea = document.querySelector('.discussion-textarea');
+    const charCount = document.getElementById('charCount');
+    const discussionBtn = document.querySelector('.discussion-btn');
+    
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            // Enable/disable discussion button
+            if (count > 0 && count <= 800) {
+                discussionBtn.disabled = false;
+            } else {
+                discussionBtn.disabled = true;
+            }
+            
+            // Change color when approaching limit
+            if (count > 750) {
+                charCount.style.color = '#ef4444';
+            } else if (count > 650) {
+                charCount.style.color = '#f59e0b';
+            } else {
+                charCount.style.color = 'var(--text-secondary)';
+            }
+        });
+    }
+    
+    // Filter tabs functionality
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Here you would implement the actual filtering logic
+            console.log('Filter by:', this.dataset.filter);
+        });
+    });
+    
+    // Discussion actions (like, comment, save)
+    const actionBtns = document.querySelectorAll('.action-btn');
+    actionBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.dataset.action;
+            const discussionCard = this.closest('.discussion-card');
+            
+            if (action === 'like') {
+                this.classList.toggle('liked');
+                const icon = this.querySelector('i');
+                if (this.classList.contains('liked')) {
+                    icon.className = 'bi bi-hand-thumbs-up-fill';
+                    this.style.color = '#10b981';
+                } else {
+                    icon.className = 'bi bi-hand-thumbs-up';
+                    this.style.color = '';
+                }
+            } else if (action === 'comment') {
+                const commentsSection = discussionCard.querySelector('.comments-section');
+                if (commentsSection.style.display === 'none') {
+                    commentsSection.style.display = 'block';
+                    commentsSection.querySelector('.comment-input').focus();
+                } else {
+                    commentsSection.style.display = 'none';
+                }
+            } else if (action === 'save') {
+                this.classList.toggle('saved');
+                const icon = this.querySelector('i');
+                if (this.classList.contains('saved')) {
+                    icon.className = 'bi bi-bookmark-fill';
+                    this.style.color = '#f59e0b';
+                } else {
+                    icon.className = 'bi bi-bookmark';
+                    this.style.color = '';
+                }
+            }
+        });
+    });
+    
+    // Comment submission
+    const commentInputs = document.querySelectorAll('.comment-input');
+    commentInputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const comment = this.value.trim();
+                if (comment) {
+                    // Here you would submit the comment
+                    console.log('Submit comment:', comment);
+                    this.value = '';
+                }
+            }
+        });
+    });
+    
+    const commentSubmitBtns = document.querySelectorAll('.comment-submit-btn');
+    commentSubmitBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('.comment-input');
+            const comment = input.value.trim();
+            if (comment) {
+                // Here you would submit the comment
+                console.log('Submit comment:', comment);
+                input.value = '';
+            }
+        });
+    });
+    
+    // Weekly topics interaction
+    const topicItems = document.querySelectorAll('.topic-item');
+    topicItems.forEach(item => {
+        item.addEventListener('click', function() {
+            topicItems.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter discussions by selected topic
+            console.log('Filter by topic:', this.querySelector('.topic-name').textContent);
+        });
+    });
+});
+</script>
+
+{% endblock %}

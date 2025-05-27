@@ -1,0 +1,1152 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Temáticas Semanales - LabGuides{% endblock %}
+
+{% block description %}Gestiona temáticas de laboratorio por semanas académicas, asigna recursos y planifica sesiones con IA integrada.{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<div class="tematicas-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="page-title">
+                    <i class="bi bi-calendar-week-fill me-3"></i>
+                    Gestión de Temáticas Semanales
+                </h1>
+                <p class="page-subtitle">
+                    Planifica y gestiona temáticas de laboratorio por semanas académicas con recursos integrados
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="user-role-badge">
+                    <i class="bi bi-person-badge-fill me-2"></i>
+                    <span class="role-text">{{ request.user.profile.role|default:"Profesor" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RF1: Selección de Programa y Semana -->
+    <div class="selection-section">
+        <div class="card selection-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-gear-fill me-2"></i>
+                    Configuración Académica
+                </h3>
+            </div>
+            <div class="card-body">
+                <form id="programSelectionForm" class="selection-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="programa_academico" class="form-label">
+                                    <i class="bi bi-book-fill me-2"></i>Programa Académico
+                                </label>
+                                <select class="form-control" id="programa_academico" name="programa_academico" required>
+                                    <option value="">Selecciona el programa</option>
+                                    <option value="quimica_analitica">Química Analítica</option>
+                                    <option value="biologia_molecular">Biología Molecular</option>
+                                    <option value="fisica_experimental">Física Experimental</option>
+                                    <option value="ingenieria_quimica">Ingeniería Química</option>
+                                    <option value="microbiologia">Microbiología</option>
+                                    <option value="biotecnologia">Biotecnología</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="semana_clase" class="form-label">
+                                    <i class="bi bi-calendar3 me-2"></i>Semana de Clase
+                                </label>
+                                <select class="form-control" id="semana_clase" name="semana_clase" required>
+                                    <option value="">Selecciona la semana</option>
+                                    <option value="1">Semana 1 - Introducción</option>
+                                    <option value="2">Semana 2 - Fundamentos</option>
+                                    <option value="3">Semana 3 - Técnicas Básicas</option>
+                                    <option value="4">Semana 4 - Análisis Preliminar</option>
+                                    <option value="5">Semana 5 - Métodos Avanzados</option>
+                                    <option value="6">Semana 6 - Instrumentación</option>
+                                    <option value="7">Semana 7 - Análisis Cuantitativo</option>
+                                    <option value="8">Semana 8 - Síntesis</option>
+                                    <option value="9">Semana 9 - Caracterización</option>
+                                    <option value="10">Semana 10 - Aplicaciones</option>
+                                    <option value="11">Semana 11 - Proyecto Integrador</option>
+                                    <option value="12">Semana 12 - Evaluación Final</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search me-2"></i>Cargar Temáticas
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="resetSelection">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reiniciar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- RF2: Temáticas Predefinidas Sugeridas -->
+    <div class="tematicas-section" id="tematicasSection" style="display: none;">
+        <div class="card tematicas-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-lightbulb-fill me-2"></i>
+                    Temáticas Sugeridas
+                </h3>
+                <div class="competencias-info">
+                    <span class="competencias-badge">
+                        <i class="bi bi-award me-1"></i>
+                        Competencias Asociadas
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tematicas-grid" id="tematicasGrid">
+                    <!-- Temáticas se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RF3: Gestión de Sesiones de Laboratorio -->
+    <div class="sesiones-section" id="sesionesSection" style="display: none;">
+        <div class="card sesiones-card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">
+                        <i class="bi bi-calendar-event-fill me-2"></i>
+                        Sesiones de Laboratorio
+                    </h3>
+                    <button class="btn btn-success" id="addSesionBtn">
+                        <i class="bi bi-plus-circle me-2"></i>Nueva Sesión
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="sesiones-timeline" id="sesionesTimeline">
+                    <!-- Sesiones se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RF4: Panel del Monitor de Laboratorio -->
+    {% if request.user.profile.role == 'monitor' or request.user.profile.role == 'profesor' %}
+    <div class="monitor-section" id="monitorSection" style="display: none;">
+        <div class="card monitor-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-tools me-2"></i>
+                    Panel del Monitor de Laboratorio
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Recursos Físicos -->
+                    <div class="col-lg-6">
+                        <div class="recursos-section">
+                            <h4 class="recursos-title">
+                                <i class="bi bi-box-seam me-2"></i>Recursos Físicos
+                            </h4>
+                            <div class="recursos-list" id="recursosFisicos">
+                                <!-- Recursos físicos se cargarán dinámicamente -->
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm" id="addRecursoFisico">
+                                <i class="bi bi-plus me-1"></i>Agregar Recurso Físico
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Recursos Digitales -->
+                    <div class="col-lg-6">
+                        <div class="recursos-section">
+                            <h4 class="recursos-title">
+                                <i class="bi bi-cloud-download me-2"></i>Recursos Digitales
+                            </h4>
+                            <div class="recursos-list" id="recursosDigitales">
+                                <!-- Recursos digitales se cargarán dinámicamente -->
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm" id="addRecursoDigital">
+                                <i class="bi bi-plus me-1"></i>Agregar Recurso Digital
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- RF5: Recomendaciones de IA -->
+    <div class="ia-section" id="iaSection" style="display: none;">
+        <div class="card ia-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-robot me-2"></i>
+                    Recomendaciones de IA
+                </h3>
+                <div class="ia-status">
+                    <span class="status-badge status-active">
+                        <i class="bi bi-circle-fill me-1"></i>IA Activa
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="ia-content">
+                    <div class="ia-suggestions" id="iaSuggestions">
+                        <!-- Sugerencias de IA se cargarán dinámicamente -->
+                    </div>
+                    <div class="ia-actions">
+                        <button class="btn btn-primary" id="generateSuggestions">
+                            <i class="bi bi-magic me-2"></i>Generar Sugerencias
+                        </button>
+                        <button class="btn btn-outline-secondary" id="refreshSuggestions">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Actualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modales -->
+
+<!-- Modal para Nueva Sesión -->
+<div class="modal fade" id="nuevaSesionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-calendar-plus me-2"></i>Nueva Sesión de Laboratorio
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="nuevaSesionForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="sesion_fecha" class="form-label">Fecha de la Sesión</label>
+                                <input type="date" class="form-control" id="sesion_fecha" name="sesion_fecha" required>
+                            </div>
+                        </div> 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="sesion_hora" class="form-label">Hora de Inicio</label>
+                                <input type="time" class="form-control" id="sesion_hora" name="sesion_hora" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sesion_tematica" class="form-label">Temática Asociada</label>
+                        <select class="form-control" id="sesion_tematica" name="sesion_tematica" required>
+                            <option value="">Selecciona una temática</option>
+                            <!-- Opciones se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sesion_descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="sesion_descripcion" name="sesion_descripcion" rows="3" placeholder="Describe los objetivos y actividades de la sesión"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="guardarSesion">
+                    <i class="bi bi-save me-2"></i>Guardar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Agregar Recurso -->
+<div class="modal fade" id="recursoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="recursoModalTitle">
+                    <i class="bi bi-plus-circle me-2"></i>Agregar Recurso
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="recursoForm">
+                    <input type="hidden" id="recurso_tipo" name="recurso_tipo">
+                    <div class="form-group">
+                        <label for="recurso_nombre" class="form-label">Nombre del Recurso</label>
+                        <input type="text" class="form-control" id="recurso_nombre" name="recurso_nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="recurso_descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="recurso_descripcion" name="recurso_descripcion" rows="2"></textarea>
+                    </div>
+                    <div class="form-group" id="recurso_cantidad_group">
+                        <label for="recurso_cantidad" class="form-label">Cantidad Disponible</label>
+                        <input type="number" class="form-control" id="recurso_cantidad" name="recurso_cantidad" min="1">
+                    </div>
+                    <div class="form-group" id="recurso_url_group" style="display: none;">
+                        <label for="recurso_url" class="form-label">URL/Enlace</label>
+                        <input type="url" class="form-control" id="recurso_url" name="recurso_url">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="guardarRecurso">
+                    <i class="bi bi-save me-2"></i>Guardar Recurso
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Container Principal */
+.tematicas-container {
+    padding: 2rem 0;
+}
+
+/* Header */
+.page-header {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.page-title i {
+    color: var(--primary-color);
+}
+
+.page-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.user-role-badge {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Cards Generales */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.card-header {
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-title i {
+    color: var(--primary-color);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Sección de Selección */
+.selection-section {
+    margin-bottom: 2rem;
+}
+
+.selection-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-control {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+/* Temáticas Grid */
+.tematicas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.tematica-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.tematica-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.tematica-card.selected {
+    border-color: var(--primary-color);
+    background: rgba(30, 64, 175, 0.05);
+}
+
+.tematica-header {
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.tematica-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+}
+
+.tematica-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.125rem;
+    margin-left: 1rem;
+}
+
+.tematica-description {
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.competencias-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.competencia-tag {
+    background: rgba(30, 64, 175, 0.1);
+    color: var(--primary-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.competencias-info {
+    display: flex;
+    align-items: center;
+}
+
+.competencias-badge {
+    background: rgba(30, 64, 175, 0.1);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+/* Timeline de Sesiones */
+.sesiones-timeline {
+    position: relative;
+}
+
+.sesion-item {
+    display: flex;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.sesion-item::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    bottom: -30px;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.sesion-item:last-child::before {
+    display: none;
+}
+
+.sesion-marker {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+    z-index: 1;
+    position: relative;
+}
+
+.sesion-content {
+    flex: 1;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.sesion-content:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.sesion-header {
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.sesion-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.sesion-date {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sesion-tematica {
+    background: rgba(30, 64, 175, 0.1);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.sesion-description {
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.sesion-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Panel del Monitor */
+.monitor-section {
+    margin-top: 2rem;
+}
+
+.recursos-section {
+    background: var(--light-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: 100%;
+}
+
+.recursos-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.recursos-list {
+    margin-bottom: 1rem;
+}
+
+.recurso-item {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+}
+
+.recurso-info {
+    flex: 1;
+}
+
+.recurso-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.recurso-description {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.recurso-cantidad {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.recurso-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Sección de IA */
+.ia-section {
+    margin-top: 2rem;
+}
+
+.ia-status {
+    display: flex;
+    align-items: center;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.status-active {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.ia-suggestions {
+    margin-bottom: 1.5rem;
+}
+
+.suggestion-item {
+    background: var(--light-bg);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.suggestion-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.suggestion-content {
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.suggestion-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.suggestion-tag {
+    background: rgba(30, 64, 175, 0.1);
+    color: var(--primary-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.ia-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .tematicas-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .sesion-item {
+        flex-direction: column;
+    }
+    
+    .sesion-marker {
+        margin-bottom: 1rem;
+        margin-right: 0;
+    }
+    
+    .ia-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 576px) {
+    .tematicas-container {
+        padding: 1rem 0;
+    }
+    
+    .page-header {
+        padding: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables globales
+    let selectedPrograma = null;
+    let selectedSemana = null;
+    let selectedTematica = null;
+    let sesiones = [];
+    let recursos = { fisicos: [], digitales: [] };
+
+    // Elementos del DOM
+    const programSelectionForm = document.getElementById('programSelectionForm');
+    const tematicasSection = document.getElementById('tematicasSection');
+    const sesionesSection = document.getElementById('sesionesSection');
+    const monitorSection = document.getElementById('monitorSection');
+    const iaSection = document.getElementById('iaSection');
+
+    // RF1: Manejo de selección de programa y semana
+    programSelectionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        selectedPrograma = document.getElementById('programa_academico').value;
+        selectedSemana = document.getElementById('semana_clase').value;
+        
+        if (selectedPrograma && selectedSemana) {
+            cargarTematicas();
+            mostrarSecciones();
+        }
+    });
+
+    // RF2: Cargar temáticas predefinidas
+    function cargarTematicas() {
+        const tematicasData = getTematicasPorPrograma(selectedPrograma, selectedSemana);
+        const tematicasGrid = document.getElementById('tematicasGrid');
+        
+        tematicasGrid.innerHTML = '';
+        
+        tematicasData.forEach(tematica => {
+            const tematicaCard = createTematicaCard(tematica);
+            tematicasGrid.appendChild(tematicaCard);
+        });
+    }
+
+    function createTematicaCard(tematica) {
+        const card = document.createElement('div');
+        card.className = 'tematica-card';
+        card.dataset.tematicaId = tematica.id;
+        
+        card.innerHTML = `
+            <div class="tematica-header">
+                <h4 class="tematica-title">${tematica.titulo}</h4>
+                <div class="tematica-icon">
+                    <i class="${tematica.icono}"></i>
+                </div>
+            </div>
+            <p class="tematica-description">${tematica.descripcion}</p>
+            <div class="competencias-list">
+                ${tematica.competencias.map(comp => `<span class="competencia-tag">${comp}</span>`).join('')}
+            </div>
+        `;
+        
+        card.addEventListener('click', function() {
+            selectTematica(tematica.id, card);
+        });
+        
+        return card;
+    }
+
+    function selectTematica(tematicaId, cardElement) {
+        // Remover selección anterior
+        document.querySelectorAll('.tematica-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Seleccionar nueva temática
+        cardElement.classList.add('selected');
+        selectedTematica = tematicaId;
+        
+        // Cargar sesiones y generar sugerencias de IA
+        cargarSesiones();
+        generarSugerenciasIA();
+    }
+
+    // RF3: Gestión de sesiones
+    function cargarSesiones() {
+        const sesionesTimeline = document.getElementById('sesionesTimeline');
+        sesionesTimeline.innerHTML = '';
+        
+        sesiones.forEach((sesion, index) => {
+            const sesionItem = createSesionItem(sesion, index + 1);
+            sesionesTimeline.appendChild(sesionItem);
+        });
+    }
+
+    function createSesionItem(sesion, numero) {
+        const item = document.createElement('div');
+        item.className = 'sesion-item';
+        
+        item.innerHTML = `
+            <div class="sesion-marker">${numero}</div>
+            <div class="sesion-content">
+                <div class="sesion-header">
+                    <h5 class="sesion-title">Sesión ${numero}</h5>
+                    <div class="sesion-date">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        ${sesion.fecha} - ${sesion.hora}
+                    </div>
+                </div>
+                <div class="sesion-tematica">${sesion.tematica}</div>
+                <p class="sesion-description">${sesion.descripcion}</p>
+                <div class="sesion-actions">
+                    <button class="btn btn-outline-primary btn-sm" onclick="editarSesion(${sesion.id})">
+                        <i class="bi bi-pencil me-1"></i>Editar
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="eliminarSesion(${sesion.id})">
+                        <i class="bi bi-trash me-1"></i>Eliminar
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        return item;
+    }
+
+    // RF4: Gestión de recursos por monitor
+    function cargarRecursos() {
+        cargarRecursosFisicos();
+        cargarRecursosDigitales();
+    }
+
+    function cargarRecursosFisicos() {
+        const container = document.getElementById('recursosFisicos');
+        container.innerHTML = '';
+        
+        recursos.fisicos.forEach(recurso => {
+            const item = createRecursoItem(recurso, 'fisico');
+            container.appendChild(item);
+        });
+    }
+
+    function cargarRecursosDigitales() {
+        const container = document.getElementById('recursosDigitales');
+        container.innerHTML = '';
+        
+        recursos.digitales.forEach(recurso => {
+            const item = createRecursoItem(recurso, 'digital');
+            container.appendChild(item);
+        });
+    }
+
+    function createRecursoItem(recurso, tipo) {
+        const item = document.createElement('div');
+        item.className = 'recurso-item';
+        
+        item.innerHTML = `
+            <div class="recurso-info">
+                <div class="recurso-name">${recurso.nombre}</div>
+                <div class="recurso-description">${recurso.descripcion}</div>
+            </div>
+            ${tipo === 'fisico' ? `<div class="recurso-cantidad">${recurso.cantidad}</div>` : ''}
+            <div class="recurso-actions">
+                <button class="btn btn-outline-primary btn-sm" onclick="editarRecurso(${recurso.id}, '${tipo}')">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="eliminarRecurso(${recurso.id}, '${tipo}')">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        return item;
+    }
+
+    // RF5: Sugerencias de IA
+    function generarSugerenciasIA() {
+        const suggestions = document.getElementById('iaSuggestions');
+        suggestions.innerHTML = '<div class="text-center"><i class="bi bi-hourglass-split"></i> Generando sugerencias...</div>';
+        
+        // Simular llamada a IA
+        setTimeout(() => {
+            const sugerencias = getSugerenciasIA(selectedTematica);
+            mostrarSugerenciasIA(sugerencias);
+        }, 2000);
+    }
+
+    function mostrarSugerenciasIA(sugerencias) {
+        const container = document.getElementById('iaSuggestions');
+        container.innerHTML = '';
+        
+        sugerencias.forEach(sugerencia => {
+            const item = createSugerenciaItem(sugerencia);
+            container.appendChild(item);
+        });
+    }
+
+    function createSugerenciaItem(sugerencia) {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        
+        item.innerHTML = `
+            <h6 class="suggestion-title">
+                <i class="bi bi-lightbulb me-2"></i>${sugerencia.titulo}
+            </h6>
+            <p class="suggestion-content">${sugerencia.contenido}</p>
+            <div class="suggestion-tags">
+                ${sugerencia.tags.map(tag => `<span class="suggestion-tag">${tag}</span>`).join('')}
+            </div>
+        `;
+        
+        return item;
+    }
+
+    // Funciones auxiliares
+    function mostrarSecciones() {
+        tematicasSection.style.display = 'block';
+        sesionesSection.style.display = 'block';
+        monitorSection.style.display = 'block';
+        iaSection.style.display = 'block';
+    }
+
+    function getTematicasPorPrograma(programa, semana) {
+        // Datos simulados - en producción vendrían de la API
+        return [
+            {
+                id: 1,
+                titulo: "Técnicas de Titulación",
+                descripcion: "Fundamentos y aplicaciones de técnicas de titulación ácido-base, redox y complejométrica.",
+                icono: "bi bi-droplet-fill",
+                competencias: ["Análisis Cuantitativo", "Cálculos Estequiométricos", "Manejo de Equipos"]
+            },
+            {
+                id: 2,
+                titulo: "Espectroscopía UV-Vis",
+                descripcion: "Principios de espectroscopía ultravioleta-visible y sus aplicaciones analíticas.",
+                icono: "bi bi-eye-fill",
+                competencias: ["Análisis Instrumental", "Interpretación de Espectros", "Cuantificación"]
+            },
+            {
+                id: 3,
+                titulo: "Cromatografía Líquida",
+                descripcion: "Técnicas de separación por cromatografía líquida de alta resolución (HPLC).",
+                icono: "bi bi-graph-up",
+                competencias: ["Separación", "Análisis Cualitativo", "Optimización de Métodos"]
+            }
+        ];
+    }
+
+    function getSugerenciasIA(tematicaId) {
+        // Sugerencias simuladas de IA
+        return [
+            {
+                titulo: "Subtema: Calibración de Equipos",
+                contenido: "Se recomienda incluir una sección sobre calibración y verificación de equipos antes de iniciar las mediciones.",
+                tags: ["Calibración", "QA/QC", "Equipos"]
+            },
+            {
+                titulo: "Recurso Adicional: Video Tutorial",
+                contenido: "Video demostrativo sobre técnicas de pipeteo y preparación de soluciones estándar.",
+                tags: ["Video", "Técnicas Básicas", "Preparación"]
+            },
+            {
+                titulo: "Actividad Práctica: Caso de Estudio",
+                contenido: "Análisis de una muestra real de agua para determinar concentración de iones metálicos.",
+                tags: ["Caso Real", "Aplicación", "Análisis"]
+            }
+        ];
+    }
+
+    // Event Listeners para modales y botones
+    document.getElementById('addSesionBtn').addEventListener('click', function() {
+        const modal = new bootstrap.Modal(document.getElementById('nuevaSesionModal'));
+        modal.show();
+    });
+
+    document.getElementById('addRecursoFisico').addEventListener('click', function() {
+        abrirModalRecurso('fisico');
+    });
+
+    document.getElementById('addRecursoDigital').addEventListener('click', function() {
+        abrirModalRecurso('digital');
+    });
+
+    document.getElementById('generateSuggestions').addEventListener('click', function() {
+        if (selectedTematica) {
+            generarSugerenciasIA();
+        }
+    });
+
+    function abrirModalRecurso(tipo) {
+        document.getElementById('recurso_tipo').value = tipo;
+        document.getElementById('recursoModalTitle').innerHTML = `
+            <i class="bi bi-plus-circle me-2"></i>Agregar Recurso ${tipo === 'fisico' ? 'Físico' : 'Digital'}
+        `;
+        
+        if (tipo === 'fisico') {
+            document.getElementById('recurso_cantidad_group').style.display = 'block';
+            document.getElementById('recurso_url_group').style.display = 'none';
+        } else {
+            document.getElementById('recurso_cantidad_group').style.display = 'none';
+            document.getElementById('recurso_url_group').style.display = 'block';
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('recursoModal'));
+        modal.show();
+    }
+
+    // Inicializar datos de ejemplo
+    sesiones = [
+        {
+            id: 1,
+            fecha: "2024-02-15",
+            hora: "08:00",
+            tematica: "Técnicas de Titulación",
+            descripcion: "Introducción a las técnicas básicas de titulación ácido-base"
+        },
+        {
+            id: 2,
+            fecha: "2024-02-22",
+            hora: "08:00",
+            tematica: "Espectroscopía UV-Vis",
+            descripcion: "Análisis cuantitativo usando espectrofotometría"
+        }
+    ];
+
+    recursos.fisicos = [
+        { id: 1, nombre: "Bureta 50mL", descripcion: "Bureta de vidrio graduada", cantidad: 10 },
+        { id: 2, nombre: "Espectrofotómetro", descripcion: "UV-Vis Shimadzu", cantidad: 2 }
+    ];
+
+    recursos.digitales = [
+        { id: 1, nombre: "Manual HPLC", descripcion: "Guía completa de operación", url: "#" },
+        { id: 2, nombre: "Software ChemStation", descripcion: "Software de análisis", url: "#" }
+    ];
+});
+
+// Funciones globales para eventos
+function editarSesion(id) {
+    console.log('Editar sesión:', id);
+}
+
+function eliminarSesion(id) {
+    console.log('Eliminar sesión:', id);
+}
+
+function editarRecurso(id, tipo) {
+    console.log('Editar recurso:', id, tipo);
+}
+
+function eliminarRecurso(id, tipo) {
+    console.log('Eliminar recurso:', id, tipo);
+}
+</script>
+
+{% endblock %}

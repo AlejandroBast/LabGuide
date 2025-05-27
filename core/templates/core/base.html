@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <title>{% block title %}LabGuides - Sistema de Gestión de Laboratorio{% endblock %}</title>
+    
+    <!-- Meta tags adicionales -->
+    <meta name="description" content="{% block description %}LabGuides - Plataforma para gestionar guías de laboratorio universitarias organizadas por temáticas semanales{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}laboratorio, guías, universidad, temáticas semanales, docentes, monitores, experimentos, protocolos{% endblock %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% load static %}{% static 'images/favicon.ico' %}">
+    
+    <style>
+        :root {
+            --primary-color: #1e40af;
+            --primary-dark: #1e3a8a;
+            --secondary-color: #059669;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --dark-bg: #0f172a;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --lab-accent: #6366f1;
+            --lab-secondary: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--light-bg);
+        }
+
+        /* Navbar mejorada con tema académico */
+        .navbar-custom {
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: var(--shadow-md);
+            padding: 0.75rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-custom.scrolled {
+            box-shadow: var(--shadow-lg);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--primary-color) !important;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+            color: var(--primary-dark) !important;
+        }
+
+        .navbar-brand img {
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-brand .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--secondary-color);
+            font-weight: 500;
+            display: block;
+            line-height: 1;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-primary) !important;
+            padding: 0.6rem 1.2rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            margin: 0 0.2rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+            background-color: rgba(30, 64, 175, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            background-color: rgba(30, 64, 175, 0.15);
+            font-weight: 600;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--lab-accent));
+            border-radius: 2px;
+        }
+
+        /* Botones de autenticación con tema académico */
+        .auth-buttons .nav-link {
+            margin: 0 0.3rem;
+        }
+
+        .btn-login {
+            color: var(--primary-color) !important;
+            border: 2px solid var(--primary-color);
+            background: transparent;
+            font-weight: 600;
+        }
+
+        .btn-login:hover {
+            background-color: var(--primary-color);
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, var(--primary-color), var(--lab-accent));
+            color: white !important;
+            border: 2px solid var(--primary-color);
+            font-weight: 600;
+        }
+
+        .btn-register:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--lab-secondary));
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            color: var(--danger-color) !important;
+            border: 2px solid var(--danger-color);
+            background: transparent;
+            font-weight: 600;
+        }
+
+        .btn-logout:hover {
+            background-color: var(--danger-color);
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        /* Container principal */
+        .main-container {
+            min-height: calc(100vh - 80px);
+            padding-top: 2rem;
+        }
+
+        /* Efectos de carga */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive mejoras */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+            
+            .nav-link {
+                padding: 0.8rem 1rem !important;
+                margin: 0.3rem 0;
+            }
+            
+            .auth-buttons {
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--border-color);
+            }
+        }
+
+        /* Indicador de usuario autenticado con tema académico */
+        .user-indicator {
+            background: linear-gradient(135deg, var(--secondary-color), var(--success-color));
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-indicator .user-role {
+            font-size: 0.7rem;
+            opacity: 0.9;
+            display: block;
+        }
+
+        /* Mejoras de accesibilidad */
+        .nav-link:focus {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Loading spinner para transiciones */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(30, 64, 175, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Estilos adicionales para tema académico */
+        .academic-badge {
+            background: linear-gradient(135deg, var(--lab-accent), var(--lab-secondary));
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% load static %}
+    
+    <!-- Navbar mejorada con tema LabGuides -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}" aria-label="LabGuides - Sistema de Gestión de Laboratorio">
+                <img src="{% static 'images/logo.jpg' %}" alt="Logo de LabGuides" width="36" height="36" class="d-inline-block">
+                <div>
+                    <span>LabGuides</span>
+                    <small class="brand-subtitle">Gestión de Laboratorio</small>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                           href="{% url 'home' %}" aria-current="{% if request.resolver_match.url_name == 'home' %}page{% endif %}">
+                            <i class="bi bi-house-door me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'publicaciones' %}active{% endif %}" 
+                           href="{% url 'publicaciones' %}">
+                            <i class="bi bi-journal-medical me-2"></i>Foro Academico
+                            <span class="academic-badge">Semanal</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'ofertas' %}active{% endif %}" 
+                           href="{% url 'ofertas' %}">
+                            <i class="bi bi-mortarboard me-2"></i>Convocatorias Académicas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'tematicas' %}active{% endif %}" 
+                            href="{%  url 'tematicas' %}">
+                            <i class="bi bi-calendar-week me-2"></i>Temáticas Semanales
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="auth-buttons d-flex align-items-center">
+                    {% if request.user.is_authenticated %}
+                        <div class="user-indicator me-3">
+                            <i class="bi bi-person-badge"></i>
+                            <div>
+                                <span>{{ request.user.get_full_name|default:request.user.username }}</span>
+                                <small class="user-role">Docente/Monitor</small>
+                            </div>
+                        </div>
+                        <a class="nav-link btn-logout" href="{% url 'salir' %}" 
+                           onclick="return confirm('¿Estás seguro de que quieres cerrar sesión?')">
+                            <i class="bi bi-box-arrow-right me-2"></i>Salir
+                        </a>
+                    {% else %}
+                        <a class="nav-link btn-login me-2" href="{% url 'login' %}">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Acceso Docente
+                        </a>
+                        <a class="nav-link btn-register" href="{% url 'register' %}">
+                            <i class="bi bi-person-plus me-2"></i>Registro Académico
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-container fade-in" style="margin-top: 90px;">
+        <div class="container">
+            <!-- Mensajes del sistema -->
+            {% if messages %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        {% for message in messages %}
+                            <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                                <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% block content %}
+            <!-- Contenido por defecto del dashboard -->
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h1 class="display-4 fw-bold text-primary mb-3">
+                        <i class="bi bi-flask me-3"></i>LabGuides
+                    </h1>
+                    <p class="lead text-secondary">
+                        Sistema integral de gestión de guías de laboratorio universitarias
+                    </p>
+                    <p class="text-muted">
+                        Organiza y gestiona protocolos de laboratorio por temáticas semanales
+                    </p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="bi bi-journal-medical text-primary" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Guías de Laboratorio</h5>
+                            <p class="card-text text-muted">
+                                Accede y gestiona protocolos de laboratorio organizados por semanas académicas
+                            </p>
+                            <a href="{% url 'publicaciones' %}" class="btn btn-primary">
+                                <i class="bi bi-arrow-right me-2"></i>Explorar Guías
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="bi bi-calendar-week text-success" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Temáticas Semanales</h5>
+                            <p class="card-text text-muted">
+                                Consulta la programación semanal de temas y experimentos de laboratorio
+                            </p>
+                            <a href="#" class="btn btn-success">
+                                <i class="bi bi-calendar-check me-2"></i>Ver Cronograma
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="bi bi-mortarboard text-warning" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title">Convocatorias</h5>
+                            <p class="card-text text-muted">
+                                Oportunidades académicas para monitores y auxiliares de laboratorio
+                            </p>
+                            <a href="{% url 'ofertas' %}" class="btn btn-warning">
+                                <i class="bi bi-search me-2"></i>Ver Convocatorias
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer académico -->
+    {% block footer %}
+    <footer class="bg-light border-top mt-5 py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-flask text-primary me-2" style="font-size: 1.5rem;"></i>
+                        <h5 class="mb-0 text-primary fw-bold">LabGuides</h5>
+                    </div>
+                    <p class="text-muted mb-3">
+                        Sistema universitario para la gestión eficiente de guías de laboratorio 
+                        organizadas por temáticas semanales.
+                    </p>
+                    <p class="text-muted small mb-0">
+                        &copy; {% now "Y" %} LabGuides. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h6 class="fw-bold text-dark mb-3">Enlaces Académicos</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted text-decoration-none">Guías de Laboratorio</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Temáticas Semanales</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Convocatorias</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Documentación</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h6 class="fw-bold text-dark mb-3">Soporte</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted text-decoration-none">Centro de Ayuda</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Manual de Usuario</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Contacto Técnico</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Política de Privacidad</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <small class="text-muted">
+                        Desarrollado para la comunidad académica universitaria
+                    </small>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-muted me-3" title="Soporte">
+                        <i class="bi bi-question-circle"></i>
+                    </a>
+                    <a href="#" class="text-muted me-3" title="Documentación">
+                        <i class="bi bi-book"></i>
+                    </a>
+                    <a href="#" class="text-muted" title="Contacto">
+                        <i class="bi bi-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Efecto de scroll en navbar
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNavbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Cerrar navbar en móvil al hacer click en un enlace
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const navbarCollapse = document.getElementById('navbarNav');
+                if (navbarCollapse.classList.contains('show')) {
+                    const bsCollapse = new bootstrap.Collapse(navbarCollapse);
+                    bsCollapse.hide();
+                }
+            });
+        });
+
+        // Animación de carga para enlaces
+        document.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.href && !this.href.includes('#') && !this.target) {
+                    const icon = this.querySelector('i');
+                    if (icon && !icon.classList.contains('bi-box-arrow-right')) {
+                        const originalClass = icon.className;
+                        icon.className = 'loading';
+                        setTimeout(() => {
+                            icon.className = originalClass;
+                        }, 1000);
+                    }
+                }
+            });
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
